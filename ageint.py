@@ -71,55 +71,34 @@ make_move(game , 2,2,1,queu_x)
 make_move(game , 1,1,1,queu_x)
 make_move(game , 2,0,1,queu_x)
 
-# اذا كان فيه اكسين جمب بعض ترجع عشرهتاخذ هل البحث بالصفوف او الاعمدة او الاقطار وتخاذ رقم العامود او الصف
-def help_evaluate(bord , way , ind , player):
-    scoor = 0
-    # rows
-    if way ==0:
-        elements, counts = np.unique(bord[ind , :], return_counts=True)
-        frequencies = dict(zip(elements, counts))
-        if  frequencies.get(player ,0) == 2:scoor = 10
-        return scoor
-#   columan
-    elif way == 1:
-        elements, counts = np.unique(bord[: , ind], return_counts=True)
-        frequencies = dict(zip(elements, counts))
-        if  frequencies.get(player ,0) == 2:scoor = 10
-        return scoor
-    # digonal
-    elif way == 2:
-        temp1 = bord[0,0]+bord[1,1]+bord[2,2]
-        temp2 =bord[0,2]+bord[1,1]+bord[2,0]
-        if temp1 == 2:scoor += 10
-        if temp2 == 2:scoor += 10
-        return scoor
-    else:
-        return False
-        
-
-
 
 
 def evaluate(bord , que_x ,que_y):
     winner = win_play(bord)
-    if winner ==1 :return 100 , 0
-    if winner ==-1 :return 0,-100
-
-    score_x = 0
+    if winner ==1 :return 1000 , 0
+    if winner ==-1 :return 0,-1000
+    score = 0
+    # دالة داخلية صغيرة لفحص الخطوط (صفوف، أعمدة، أقطار)
+    def check_line(line, player):
+        elements, counts = np.unique(line, return_counts=True)
+        freq = dict(zip(elements, counts))
+        # إذا وجدنا قطعتين للاعب والخانة الثالثة فارغة (تهديد حقيقي)
+        if freq.get(player, 0) == 2 and freq.get(0, 0) == 1:
+            return 20
+        return 0
+    
     for i in range(3):
-        for x in range(3):
-            score_x= score_x+help_evaluate(bord , i , x , 1)
-            if i ==2:
-                break
-
-    score_y = 0
-    for i in range(3):
-        for x in range(3):
-            score_y = score_y + help_evaluate(bord , i , x , -1)
-            if i == 2:
-                break
-
-    return score_x,score_y
+        score += check_line(bord[i, :], 1)   
+        score -= check_line(bord[i, :], -1)  
+        score += check_line(bord[:, i], 1)   
+        score -= check_line(bord[:, i], -1) 
+    
+    # فحص الاقطار  
+    diag1 = np.diag(bord)
+    diag2 = np.diag(np.fliplr(bord))
+    score += check_line(diag1, 1) + check_line(diag2, 1)
+    score -= check_line(diag1, -1) + check_line(diag2, -1)
+    return score
 
 
 
