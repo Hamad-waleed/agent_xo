@@ -1,10 +1,11 @@
 import numpy as np 
 from collections import deque
+import copy
 class TicTacToe3Pieces:
     def __init__(self):
         self.board = np.zeros((3,3), dtype=int)
         self.queu_x = deque()
-        self.queu_o = deque()
+        self.queu_y = deque()
 
 
 # to genrat the all posipal move
@@ -63,12 +64,25 @@ class TicTacToe3Pieces:
         player_que.append((row , coulman))
         return True
 
-  
-    def evaluate(self , bord):
+
+    def cliening_eva(self, bord , que_x , que_y):
+        temp_bord = np.copy.deepcopy(bord)
+
+        if len(que_x )== 3:
+            r_x, c_x = que_x[0]
+            temp_bord[r_x , c_x] = 0
+        if len (que_y)==3:
+            r_y, c_y = que_y[0]
+            temp_bord[r_y , c_y] = 0
+
+        return temp_bord
+
+    def evaluate(self , bord , que_x , que_y):
         winner = self.win_play(bord)
-        if winner ==1 :return 1000 , 0
-        if winner ==-1 :return 0,-1000
+        if winner ==1 :return 1000
+        if winner ==-1 :return -1000
         score = 0
+        bord = self.cliening_eva(bord , que_x ,que_y)
         # دالة داخلية صغيرة لفحص الخطوط (صفوف، أعمدة، أقطار)
         def check_line(line, player):
             elements, counts = np.unique(line, return_counts=True)
