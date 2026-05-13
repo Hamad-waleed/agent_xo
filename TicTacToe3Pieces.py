@@ -66,7 +66,7 @@ class TicTacToe3Pieces:
 
 
     def cliening_eva(self, bord , que_x , que_y):
-        temp_bord = np.copy.deepcopy(bord)
+        temp_bord = copy.deepcopy(bord)
 
         if len(que_x )== 3:
             r_x, c_x = que_x[0]
@@ -109,15 +109,4 @@ class TicTacToe3Pieces:
 
 
 
-game_instance = TicTacToe3Pieces()
 
-# تنفيذ حركات لتجربة حذف القطع
-game_instance.make_move(game_instance.board, 1, 1, 1, game_instance.queu_x)
-game_instance.make_move(game_instance.board, 0, 0, 1, game_instance.queu_x)
-game_instance.make_move(game_instance.board, 0, 2, 1, game_instance.queu_x)
-# الحركة الرابعة ستحذف أول قطعة (1,1)
-game_instance.make_move(game_instance.board, 0, 1, 1, game_instance.queu_x)
-
-print("لوحة اللعب بعد 4 حركات للاعب X:")
-print(game_instance.board)
-print("نقاط التقييم الحالية:", game_instance.evaluate(game_instance.board))
