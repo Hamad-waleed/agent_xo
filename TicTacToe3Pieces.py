@@ -9,36 +9,36 @@ class TicTacToe3Pieces:
 
 
 # to genrat the all posipal move
-    def genret_move(self,bord):
+    def genret_move(self,board):
         expexted = []
         # row
         for row in range(3):
             # columan
             for columan in range(3):
-                if bord[row , columan] == 0:
+                if board[row , columan] == 0:
                     expexted.append((row,columan))
         return expexted
 # print(genret_move(board))
 
-    def win_play(self,bord):
+    def win_play(self,board):
         num = 0
         # this to win in the row
         for row in range(3):
-            temp = bord[row , :].sum()
+            temp = board[row , :].sum()
             if( temp ==3 or temp ==-3 ): 
                 num = temp
                 break
         # this to win in coulman
         for columan in range(3):
-            temp = bord[: , columan].sum()
+            temp = board[: , columan].sum()
             if( temp ==3 or temp ==-3 ): 
                 num = temp
                 break
         # digonal
-        temp = bord[0,0]+bord[1,1]+bord[2,2]
+        temp = board[0,0]+board[1,1]+board[2,2]
         if( temp ==3 or temp ==-3 ): 
                 num = temp
-        temp = bord[0,2]+bord[1,1]+bord[2,0]
+        temp = board[0,2]+board[1,1]+board[2,0]
         if( temp ==3 or temp ==-3 ): 
                 num = temp
         
@@ -50,39 +50,39 @@ class TicTacToe3Pieces:
             return 0
 
 
-    def make_move(self ,  bord , row :int, coulman :int , player :int , player_que :deque):
-        if self.win_play(bord) != 0:
+    def make_move(self ,  board , row :int, coulman :int , player :int , player_que :deque):
+        if self.win_play(board) != 0:
             return False
 
         if(len(player_que) == 3):
             old_r , old_c = player_que.popleft()
-            bord[old_r , old_c] = 0
-        if(bord[row ,coulman] != 0):
+            board[old_r , old_c] = 0
+        if(board[row ,coulman] != 0):
             return False
-        bord[row ,coulman] = player
+        board[row ,coulman] = player
         
         player_que.append((row , coulman))
         return True
 
 
-    def cliening_eva(self, bord , que_x , que_y):
-        temp_bord = copy.deepcopy(bord)
+    def cliening_eva(self, board , que_x , que_y):
+        temp_board = copy.deepcopy(board)
 
         if len(que_x )== 3:
             r_x, c_x = que_x[0]
-            temp_bord[r_x , c_x] = 0
+            temp_board[r_x , c_x] = 0
         if len (que_y)==3:
             r_y, c_y = que_y[0]
-            temp_bord[r_y , c_y] = 0
+            temp_board[r_y , c_y] = 0
 
-        return temp_bord
+        return temp_board
 
-    def evaluate(self , bord , que_x , que_y):
-        winner = self.win_play(bord)
+    def evaluate(self , board , que_x , que_y):
+        winner = self.win_play(board)
         if winner ==1 :return 1000
         if winner ==-1 :return -1000
         score = 0
-        bord = self.cliening_eva(bord , que_x ,que_y)
+        board = self.cliening_eva(board , que_x ,que_y)
         # دالة داخلية صغيرة لفحص الخطوط (صفوف، أعمدة، أقطار)
         def check_line(line, player):
             elements, counts = np.unique(line, return_counts=True)
@@ -93,19 +93,31 @@ class TicTacToe3Pieces:
             return 0
         
         for i in range(3):
-            score += check_line(bord[i, :], 1)   
-            score -= check_line(bord[i, :], -1)  
-            score += check_line(bord[:, i], 1)   
-            score -= check_line(bord[:, i], -1) 
+            score += check_line(board[i, :], 1)   
+            score -= check_line(board[i, :], -1)  
+            score += check_line(board[:, i], 1)   
+            score -= check_line(board[:, i], -1) 
         
         # فحص الاقطار  
-        diag1 = np.diag(bord)
-        diag2 = np.diag(np.fliplr(bord))
+        diag1 = np.diag(board)
+        diag2 = np.diag(np.fliplr(board))
         score += check_line(diag1, 1) + check_line(diag2, 1)
         score -= check_line(diag1, -1) + check_line(diag2, -1)
         return score
 
-
+    def print_board(self):
+        print("\n-------------")
+        for row in self.board:
+            print("|", end=" ")
+            for cell in row:
+                if cell == 1:
+                    char = 'X'
+                elif cell == -1:
+                    char = 'O'
+                else:
+                    char = ' ' # أو حط '.' إذا تبي الفراغ يبين
+                print(f"{char} |", end=" ")
+            print("\n-------------")
 
 
 
