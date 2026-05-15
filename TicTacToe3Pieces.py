@@ -64,7 +64,15 @@ class TicTacToe3Pieces:
         player_que.append((row , coulman))
         return True
 
-
+    def reset_game(self):
+    
+        self.board = np.zeros((3,3), dtype=int)
+        self.queu_x = deque()
+        self.queu_y = deque()
+          
+        return self.board
+    
+    
     def cliening_eva(self, board , que_x , que_y):
         temp_board = copy.deepcopy(board)
 
