@@ -71,6 +71,8 @@ def mcts_vs_ab(game: TicTacToe3Pieces, ai :alpha_beta , mc :mcts , ai_depth=5, m
         "results": results,
         "avg_mcts_time_ms": avg_P1*1000,
         "avg_ab_time_ms": avg_P2*1000,
+        "total time to one match S" : avg_P1*i+avg_P2*i,
+        "one move x , o ms" :(time_P1[0]*1000, time_P2[0]*1000)
     } 
 
 # alpha beta vs alpha beta and return avg time to move and result 
@@ -94,13 +96,12 @@ def ab_vs_ab(game: TicTacToe3Pieces, ai :alpha_beta , depth_x=5 , depth_o=5 , ma
             print("the round is " , i+1)
             print("-"*20)
 
+            #  X player
             start = time.time()
             x = ai.all_alpha_beta_x(board , game , depth_x , -float('inf') , float('inf') , que_x , que_y)[1]
             end = time.time()
 
             time_P1.append(end-start)
-
-            
 
             game.make_move(board , x[0] , x[1] , 1 , que_x)
             game.print_board()
@@ -108,8 +109,8 @@ def ab_vs_ab(game: TicTacToe3Pieces, ai :alpha_beta , depth_x=5 , depth_o=5 , ma
                 print("X is win raond " , i+1)
                 results['P1_Wins'] +=1
                 break
-            
-
+        
+            # O player
             start = time.time()
             o = ai.all_alpha_beta_y(board , game , depth_o, -float('inf') , float('inf') , que_x , que_y)[1]
             end = time.time()
@@ -132,6 +133,8 @@ def ab_vs_ab(game: TicTacToe3Pieces, ai :alpha_beta , depth_x=5 , depth_o=5 , ma
         "results": results,
         "avg_ap_X_time_ms": avg_P1*1000,
         "avg_ab_O_time_ms": avg_P2*1000,
+        "total time to one match S" : avg_P1*i+avg_P2*i,
+        "one move xo MS" :(time_P1[0]*1000 , time_P2[0]*1000)
     } 
 
 def mctc_vs_mcts(game , mc , iter_x=100, iter_o=100, match = 10):
@@ -192,14 +195,16 @@ def mctc_vs_mcts(game , mc , iter_x=100, iter_o=100, match = 10):
         "results": results,
         "avg_ap_X_time_ms": avg_P1*1000,
         "avg_ab_O_time_ms": avg_P2*1000,
+        "total time to one match S" : avg_P1*i+avg_P2*i,
+        "one move xo MS" :(time_P1[0]*1000, time_P2[0]*1000)
     }
 
-# test =mcts_vs_ab(game , ai ,mc,4 , 100)
 
 
+test =mcts_vs_ab(game , ai ,mc,6 , 1000 ,50)
 
-# test = ab_vs_ab(game , ai ,4 ,9)
+# test = ab_vs_ab(game , ai ,5,5)
 
-test = mctc_vs_mcts(game , mc ,10 ,10,10)
+# test = mctc_vs_mcts(game , mc ,10 ,10,10)
 
 print(test)
