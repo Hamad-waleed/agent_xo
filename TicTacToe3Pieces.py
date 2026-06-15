@@ -86,19 +86,35 @@ class TicTacToe3Pieces:
         return temp_board
 
     def evaluate(self , board , que_x , que_y):
+
         winner = self.win_play(board)
-        if winner ==1 :return 1000
+        if winner == 1 :return 1000
         if winner ==-1 :return -1000
+       
         score = 0
         board = self.cliening_eva(board , que_x ,que_y)
         # دالة داخلية صغيرة لفحص الخطوط (صفوف، أعمدة، أقطار)
         def check_line(line, player):
+            temp_scour = 0
             elements, counts = np.unique(line, return_counts=True)
             freq = dict(zip(elements, counts))
             # إذا وجدنا قطعتين للاعب والخانة الثالثة فارغة (تهديد حقيقي)
             if freq.get(player, 0) == 2 and freq.get(0, 0) == 1:
-                return 20
-            return 0
+                temp_scour += 20
+            if freq.get(-player, 0) == 2 and freq.get(0, 0) == 1:
+                temp_scour -= 20
+            #إذا وجدنا قطعة واحدة للاعب والخانة الثالثة والثانية فارغة
+            if freq.get(player, 0) == 1 and freq.get(0, 0) == 2:
+                temp_scour += 10
+            if freq.get(-player, 0) == 1 and freq.get(0, 0) == 2:
+                temp_scour -= 10
+            return temp_scour
+        
+        
+        if board[1, 1] == 1:
+            score += 10
+        elif board[1, 1] == -1:
+            score -= 10
         
         for i in range(3):
             score += check_line(board[i, :], 1)   
@@ -111,6 +127,18 @@ class TicTacToe3Pieces:
         diag2 = np.diag(np.fliplr(board))
         score += check_line(diag1, 1) + check_line(diag2, 1)
         score -= check_line(diag1, -1) + check_line(diag2, -1)
+        corners = [(0, 0), (0, 2), (2, 0), (2, 2)]
+
+# 2. مر على الزوايا وافحص من يسيطر عليها
+        for row, col in corners:
+            if board[row, col] == 1:
+                score += 3   # إضافة 3 نقاط إذا كانت الزاوية للاعب 1
+            elif board[row, col] == -1:
+                score -= 3   # خصم 3 نقاط إذا كانت الزاوية للاعب -1
+        if score >= 75: 
+            score += 200  # مكافأة الشوكة للاعب 1
+        elif score <= -75:
+            score -= 200
         return score
 
     def print_board(self):
