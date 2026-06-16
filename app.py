@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 from TicTacToe3Pieces import TicTacToe3Pieces
 from alpha_beta_Agent import alpha_beta
+from MCTS import mcts 
 import time
 
 st.set_page_config(page_title="AI Settings Mode", layout="centered")
@@ -57,7 +58,7 @@ with st.sidebar:
     mode = st.radio("Who starts (as X)?", ("AI starts", "Human starts"))
     
     # التحكم بالديبث (من 1 إلى 9)
-    chosen_depth = st.slider("AI Depth (Difficulty)", min_value=1, max_value=9, value=4)
+    chosen_depth = st.slider("AI Depth (Difficulty)", min_value=1, max_value=10, value=4)
     
     if st.button("Apply & Reset Game"):
         st.session_state.clear()
@@ -66,7 +67,7 @@ with st.sidebar:
 # 2. تهيئة اللعبة بناءً على الإعدادات
 if 'game' not in st.session_state:
     st.session_state.game = TicTacToe3Pieces()
-    st.session_state.ai = alpha_beta(depth=chosen_depth)
+    st.session_state.ai = mcts()
     
     if mode == "AI starts":
         st.session_state.player_val = -1 # Human is O
@@ -78,23 +79,30 @@ if 'game' not in st.session_state:
         st.session_state.needs_ai_move = False
 
 game = st.session_state.game
-ai = st.session_state.ai
+mc = st.session_state.ai
 
 st.title("Custom AI Battle")
 st.write(f"Mode: **{mode}** | Difficulty: **{chosen_depth}**")
-
-# 3. منطق حركة الذكاء الاصطناعي
+# 3. منطق حركة الذكاء الاصطناعي (باستخدام MCTS)
 if st.session_state.get('needs_ai_move', False) and game.win_play(game.board) == 0:
-    with st.spinner('AI is thinking...'):
+    with st.spinner('AI (MCTS) is thinking...'):
         # تأخير للواقعية إلا في أول حركة باللعبة
-        if np.sum(game.board != 0) > 0:
-            time.sleep(1)
+        # if np.sum(game.board != 0) > 0:
+        #     time.sleep(1)
         
-        # استدعاء الدالة المناسبة بناءً على هوية الـ AI (X أو O)
-        if st.session_state.ai_val == 1:
-            _, move = ai.all_alpha_beta_x(game.board, game, chosen_depth, -float('inf'), float('inf'), game.queu_x, game.queu_y)
-        else:
-            _, move = ai.all_alpha_beta_y(game.board, game, chosen_depth, -float('inf'), float('inf'), game.queu_x, game.queu_y)
+        # تحديد عدد المحاكاة (Iterations) المطلوب للـ MCTS
+        mcts_iterations = chosen_depth 
+        
+        # استدعاء دالة البحث للـ MCTS وتمرير المتغيرات بالترتيب الصحيح لها
+        # الدالة ترجع الحركة مباشرة (move) بناءً على المدخلات
+        move = mc.search(
+            game, 
+            game.board, 
+            st.session_state.ai_val, 
+            game.queu_x, 
+            game.queu_y, 
+            iter=mcts_iterations*100
+        )
             
         if move:
             target_q = game.queu_x if st.session_state.ai_val == 1 else game.queu_y
